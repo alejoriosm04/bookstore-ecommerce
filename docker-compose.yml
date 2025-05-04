@@ -21,10 +21,24 @@ services:
     restart: always
     environment:
       - FLASK_ENV=development
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     depends_on:
       - db
+    networks:
+      - bookstore_net
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"  # Para HTTPS si lo configuras después
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./static:/app/static  # Para servir archivos estáticos
+    depends_on:
+      - flaskapp
     networks:
       - bookstore_net
 
