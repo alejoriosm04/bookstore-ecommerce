@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Payment Page</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label>Payment Method:</label>
+    <select name="method" class="form-control" required>
+      <option value="Credit Card">Credit Card</option>
+      <option value="Paypal">Paypal</option>
+      <option value="Bank Transfer">Bank Transfer</option>
+    </select>
+  </div>
+  <input type="hidden" name="amount" value="100"> <!-- Puedes ajustar el monto real -->
+  <button type="submit" class="btn btn-primary">Pay Now</button>
+</form>
+{% endblock %}
