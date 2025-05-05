@@ -19,8 +19,8 @@ volumes:
     driver: local
     driver_opts:
       type: nfs
-      o: addr=nfs-server,nolock,soft,rw
-      device: ":/mnt/efs/static"
+      o: addr=fs-0ab6ccd6c572caef0.efs.us-east-1.amazonaws.com,nfsvers=4.1,rw
+      device: ":/static"
 
 networks:
   bookstore_net:
