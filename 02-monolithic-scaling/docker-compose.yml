@@ -6,8 +6,8 @@ services:
     restart: always
     environment:
       - FLASK_ENV=development
-    expose:
-      - "5000"
+    ports:
+      - "5000:5000"
     volumes:
       - nfs_static:/app/static
     networks:
