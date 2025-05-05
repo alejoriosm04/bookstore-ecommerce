@@ -8,11 +8,19 @@ services:
       - FLASK_ENV=development
     expose:
       - "5000"
+    volumes:
+      - nfs_static:/app/static
     networks:
       - bookstore_net
 
 volumes:
   db_data:
+  nfs_static:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=nfs-server,nolock,soft,rw
+      device: ":/mnt/efs/static"
 
 networks:
   bookstore_net:

@@ -25,6 +25,8 @@ services:
       - "5000"
     depends_on:
       - db
+    volumes:
+      - efs_data:/app/data  # Mount EFS volume for persistent data
     networks:
       - bookstore_net
 
@@ -38,6 +40,7 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./static:/app/static  # Para servir archivos estáticos
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - efs_data:/app/data  # Mount EFS volume for serving files
     depends_on:
       - flaskapp
     networks:
@@ -45,6 +48,12 @@ services:
 
 volumes:
   db_data:
+  efs_data:
+    driver: local
+    driver_opts:
+      type: nfs4
+      o: addr=YOUR_EFS_ENDPOINT,rw
+      device: ":/"
 
 networks:
   bookstore_net:
