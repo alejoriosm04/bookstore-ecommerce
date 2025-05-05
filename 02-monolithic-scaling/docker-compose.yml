@@ -1,21 +1,6 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:8
-    restart: always
-    environment:
-      MYSQL_DATABASE: bookstore
-      MYSQL_USER: bookstore_user
-      MYSQL_PASSWORD: bookstore_pass
-      MYSQL_ROOT_PASSWORD: root_pass
-    ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - bookstore_net
-
   flaskapp:
     build: .
     restart: always
@@ -23,23 +8,6 @@ services:
       - FLASK_ENV=development
     expose:
       - "5000"
-    depends_on:
-      - db
-    networks:
-      - bookstore_net
-
-  nginx:
-    image: nginx:alpine
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"  # Para HTTPS si lo configuras después
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./static:/app/static  # Para servir archivos estáticos
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-    depends_on:
-      - flaskapp
     networks:
       - bookstore_net
 
