@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Mis Libros</h2>
+
+    {% if books %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+            <tr>
+                <td>{{ book.title }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.description }}</td>
+                <td>${{ "%.2f"|format(book.price) }}</td>
+                <td>{{ book.stock }}</td>
+                <td>
+                    <a href="{{ url_for('book.edit_book', book_id=book.id) }}" class="btn btn-sm btn-warning">Editar</a>
+                    <form action="{{ url_for('book.delete_book', book_id=book.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de que deseas borrar este libro?');">Borrar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No tienes libros publicados todavía.</p>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('book.add_book') }}" class="btn btn-primary">Agregar Nuevo Libro</a>
+        <a href="{{ url_for('book.catalog') }}" class="btn btn-secondary">Volver al Catálogo</a>
+    </div>
+</div>
+{% endblock %}

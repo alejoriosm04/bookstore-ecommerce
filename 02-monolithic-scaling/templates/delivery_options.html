@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Seleccionar Proveedor de Entrega</h2>
+
+  <form method="POST" action="{{ url_for('delivery.select_delivery', purchase_id=purchase_id) }}">
+      <div class="mb-3">
+          <select name="provider" class="form-select" required>
+              {% for provider in providers %}
+                  <option value="{{ provider.id }}">
+                      {{ provider.name }} - {{ provider.coverage_area }} - ${{ provider.cost }}
+                  </option>
+              {% endfor %}
+          </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Confirmar Entrega</button>
+  </form>
+
+  <div class="mt-3">
+      <a href="{{ url_for('book.catalog') }}" class="btn btn-secondary">Cancelar y Volver al Catálogo</a>
+  </div>
+</div>
+{% endblock %}

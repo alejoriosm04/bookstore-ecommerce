@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Catalog of Books</h2>
+<div class="row">
+  {% for book in books %}
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">{{ book.title }}</h5>
+        <p class="card-text">Author: {{ book.author }}</p>
+        <p>Price: ${{ book.price }}</p>
+        
+          {% if book.stock > 0 %}
+            <p class="card-text"></p>
+              <strong>Unidades disponibles:</strong> {{ book.stock }}
+            </p>
+            <form method="POST" action="{{ url_for('purchase.buy', book_id=book.id) }}">
+              <input type="hidden" name="price" value="{{ book.price }}">
+              <input type="number" name="quantity" class="form-control mb-2" value="1" min="1">
+              <button type="submit" class="btn btn-primary">Buy</button>
+            </form>
+          {% else %}
+          <p class="card-text"></p>
+              <strong class="text-danger">No disponibles</strong>
+          </p>
+          {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Bienvenido a la Plataforma Bookstore</h2>
+
+    <div class="d-grid gap-3">
+        <a href="{{ url_for('book.catalog') }}" class="btn btn-primary btn-lg">Ver Catálogo de Libros</a>
+        <a href="{{ url_for('book.my_books') }}" class="btn btn-secondary btn-lg">Ver Mis Libros</a>
+        <a href="{{ url_for('admin.list_users') }}" class="btn btn-info btn-lg">Listar Usuarios Registrados</a>
+    </div>
+</div>
+{% endblock %}
