@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmation{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 form-container text-center">
+        <h2 class="mb-4">Order Confirmation</h2>
+        <div class="alert alert-success mb-4">
+            <h4>Thank you for your purchase!</h4>
+            <p>Your order #{{ order_id }} has been confirmed.</p>
+        </div>
+        <a href="{{ url_for('view_catalog') }}" class="btn btn-primary">Back to Catalog</a>
+    </div>
+</div>
+{% endblock %}

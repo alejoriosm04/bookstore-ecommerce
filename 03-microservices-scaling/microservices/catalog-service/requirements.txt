@@ -1,0 +1,7 @@
+flask
+flask-sqlalchemy
+flask-migrate
+pymysql
+pika
+python-dotenv
+gunicorn

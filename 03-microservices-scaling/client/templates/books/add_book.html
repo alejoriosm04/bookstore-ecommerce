@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Add Book{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 form-container">
+        <h2 class="mb-4">Add New Book</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="mb-3">
+                <label for="author" class="form-label">Author</label>
+                <input type="text" class="form-control" id="author" name="author" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="price" class="form-label">Price</label>
+                <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+            </div>
+            <div class="mb-3">
+                <label for="stock" class="form-label">Stock</label>
+                <input type="number" class="form-control" id="stock" name="stock" required>
+            </div>
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('my_books') }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Add Book</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
