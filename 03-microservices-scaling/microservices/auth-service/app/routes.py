@@ -46,3 +46,15 @@ def login():
         'user_id': user.id,
         'name': user.name
     }), 200
+
+@auth_routes.route('/users', methods=['GET'])
+def list_users():
+    try:
+        users = User.query.all()
+        return jsonify([{
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+        } for user in users]), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

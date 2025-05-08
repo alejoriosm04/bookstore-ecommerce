@@ -21,7 +21,7 @@ def configure_routes(app):
         return jsonify(response.json()), response.status_code
 
     @app.route('/books', methods=['GET'])
-    @token_required
+    # @token_required
     def get_books():
         response = requests.get(
             f"{Config.CATALOG_SERVICE_URL}/books",
@@ -30,7 +30,7 @@ def configure_routes(app):
         return jsonify(response.json()), response.status_code
 
     @app.route('/orders', methods=['POST'])
-    @token_required
+    # @token_required
     def create_order():
         response = requests.post(
             f"{Config.ORDER_SERVICE_URL}/orders",
@@ -40,7 +40,7 @@ def configure_routes(app):
         return jsonify(response.json()), response.status_code
 
     @app.route('/orders/<order_id>/pay', methods=['POST'])
-    @token_required
+    # @token_required
     def pay_order(order_id):
         response = requests.post(
             f"{Config.ORDER_SERVICE_URL}/orders/{order_id}/pay",
@@ -50,10 +50,29 @@ def configure_routes(app):
         return jsonify(response.json()), response.status_code
     
     @app.route('/books', methods=['POST'])
+    # @token_required
     def create_book():
         response = requests.post(
             f"{Config.ORDER_SERVICE_URL}/books",  # Note: Uses ORDER_SERVICE not CATALOG_SERVICE
             json=request.json,
+            headers={'Authorization': request.headers.get('Authorization')}
+        )
+        return jsonify(response.json()), response.status_code
+
+    @app.route('/books/<int:book_id>', methods=['GET'])
+    # @token_required
+    def get_book(book_id):
+        response = requests.get(
+            f"{Config.CATALOG_SERVICE_URL}/books/{book_id}",
+            headers={'Authorization': request.headers.get('Authorization')}
+        )
+        return jsonify(response.json()), response.status_code
+    
+    @app.route('/users', methods=['GET'])
+    # @token_required
+    def list_users():
+        response = requests.get(
+            f"{Config.AUTH_SERVICE_URL}/users",
             headers={'Authorization': request.headers.get('Authorization')}
         )
         return jsonify(response.json()), response.status_code

@@ -8,27 +8,31 @@ logger = logging.getLogger(__name__)
 class BookService:
     @staticmethod
     def create_book(title, author, description, price, stock, seller_id):
-        book = Book(
-            title=title,
-            author=author,
-            description=description,
-            price=price,
-            stock=stock,
-            seller_id=seller_id
-        )
-        db.session.add(book)
-        db.session.commit()
+        try:
+            book = Book(
+                title=title,
+                author=author,
+                description=description,
+                price=price,
+                stock=stock,
+                seller_id=seller_id
+            )
+            db.session.add(book)
+            db.session.commit()
+            
+            publish_book_event('BOOK_CREATED', {
+                'id': book.id,
+                'title': book.title,
+                'author': book.author,
+                'description': book.description,
+                'price': float(book.price),
+                'stock': book.stock
+            })
         
-        publish_book_event('BOOK_CREATED', {
-            'id': book.id,
-            'title': book.title,
-            'author': book.author,
-            'description': book.description,
-            'price': book.price,
-            'stock': book.stock
-        })
-        
-        return book
+            return book
+        except Exception as e:
+            db.session.rollback()
+            raise e
     
     @staticmethod
     def update_book(book_id, **kwargs):

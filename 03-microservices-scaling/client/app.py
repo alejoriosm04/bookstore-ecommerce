@@ -91,7 +91,6 @@ def my_books():
     if 'user' not in session:
         return redirect(url_for('login'))
     
-    # In a real app, we would filter books by seller_id
     try:
         response = requests.get(
             f"{API_GATEWAY_URL}/books",
@@ -283,6 +282,15 @@ def order_confirmation(order_id):
         return redirect(url_for('login'))
     
     return render_template('orders/order_confirmation.html', order_id=order_id)
+
+@app.route('/users')
+def list_users():
+    response = requests.get(
+        f"{API_GATEWAY_URL}/users",
+        headers={'Authorization': f"Bearer {session.get('token')}"}
+    )
+    users = response.json()
+    return render_template('auth/list.html', users=users)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
