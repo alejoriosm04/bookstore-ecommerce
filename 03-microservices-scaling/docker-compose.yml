@@ -1,7 +1,7 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # Message Broker
+  # ---------- Message Broker ----------
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -9,9 +9,14 @@ services:
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_DEFAULT_PASS: adminpass
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
-  # Databases
+  # ---------- Databases ----------
   auth-db:
     image: mysql:8
     environment:
@@ -19,6 +24,11 @@ services:
       MYSQL_DATABASE: auth_db
     volumes:
       - auth_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-prootpass"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   catalog-db:
     image: mysql:8
@@ -27,6 +37,11 @@ services:
       MYSQL_DATABASE: catalog_db
     volumes:
       - catalog_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-prootpass"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   order-db:
     image: mysql:8
@@ -35,55 +50,82 @@ services:
       MYSQL_DATABASE: order_db
     volumes:
       - order_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-prootpass"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
-  # Microservices
+  # ---------- Microservices ----------
   auth-service:
     build: ./microservices/auth-service
     ports:
-      - "5001:5000"
+      - "5001:5001"
     environment:
       DB_HOST: auth-db
-      JWT_SECRET: ${JWT_SECRET}
+      DB_USER: root
+      DB_PASSWORD: rootpass
+      DB_NAME: auth_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: admin
+      RABBITMQ_PASS: adminpass
     depends_on:
-      - auth-db
-      - rabbitmq
+      auth-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   catalog-service:
     build: ./microservices/catalog-service
     ports:
-      - "5002:5000"
+      - "5002:5002"
     environment:
       DB_HOST: catalog-db
+      DB_USER: root
+      DB_PASSWORD: rootpass
+      DB_NAME: catalog_db
       RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: admin
+      RABBITMQ_PASS: adminpass
     depends_on:
-      - catalog-db
-      - rabbitmq
+      catalog-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   order-service:
     build: ./microservices/order-service
     ports:
-      - "5003:5000"
+      - "5003:5003"
     environment:
       DB_HOST: order-db
+      DB_USER: root
+      DB_PASSWORD: rootpass
+      DB_NAME: order_db
       RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: admin
+      RABBITMQ_PASS: adminpass
     depends_on:
-      - order-db
-      - rabbitmq
+      order-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
+  # ---------- API Gateway ----------
   api-gateway:
     build: ./api-gateway
     ports:
       - "5000:5000"
     environment:
-      AUTH_SERVICE_URL: http://auth-service:5000
-      CATALOG_SERVICE_URL: http://catalog-service:5000
-      ORDER_SERVICE_URL: http://order-service:5000
-      JWT_SECRET: ${JWT_SECRET}
+      AUTH_SERVICE_URL: http://auth-service:5001
+      CATALOG_SERVICE_URL: http://catalog-service:5002
+      ORDER_SERVICE_URL: http://order-service:5003
     depends_on:
       - auth-service
       - catalog-service
       - order-service
 
+  # ---------- Frontend ----------
   client:
     build: ./client
     ports:
