@@ -51,7 +51,7 @@ services:
         constraints: [node.role == manager]
 
   auth-service:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/auth-service:latest
+    image: ${DOCKER_USERNAME}/auth-service:latest
     ports:
       - "5001:5001"
     environment:
@@ -72,7 +72,7 @@ services:
         max_attempts: 3
 
   catalog-service:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/catalog-service:latest
+    image: ${DOCKER_USERNAME}/catalog-service:latest
     ports:
       - "5002:5002"
     environment:
@@ -92,7 +92,7 @@ services:
         condition: on-failure
 
   order-service:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/order-service:latest
+    image: ${DOCKER_USERNAME}/order-service:latest
     ports:
       - "5003:5003"
     environment:
@@ -112,7 +112,7 @@ services:
         condition: on-failure
 
   api-gateway:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/api-gateway:latest
+    image: ${DOCKER_USERNAME}/api-gateway:latest
     ports:
       - "5000:5000"
     environment:
@@ -128,7 +128,7 @@ services:
         condition: on-failure
 
   client:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/client:latest
+    image: ${DOCKER_USERNAME}/client:latest
     ports:
       - "8080:8080"
     deploy:
