@@ -1,0 +1,152 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: adminpass
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+  auth-db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: auth_db
+    volumes:
+      - auth_db_data:/var/lib/mysql
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+  catalog-db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: catalog_db
+    volumes:
+      - catalog_db_data:/var/lib/mysql
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+  order-db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: order_db
+    volumes:
+      - order_db_data:/var/lib/mysql
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+
+  auth-service:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/auth-service:latest
+    ports:
+      - "5001:5001"
+    environment:
+      DB_HOST: auth-db
+      DB_USER: root
+      DB_PASSWORD: rootpass
+      DB_NAME: auth_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: admin
+      RABBITMQ_PASS: adminpass
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+
+  catalog-service:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/catalog-service:latest
+    ports:
+      - "5002:5002"
+    environment:
+      DB_HOST: catalog-db
+      DB_USER: root
+      DB_PASSWORD: rootpass
+      DB_NAME: catalog_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: admin
+      RABBITMQ_PASS: adminpass
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  order-service:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/order-service:latest
+    ports:
+      - "5003:5003"
+    environment:
+      DB_HOST: order-db
+      DB_USER: root
+      DB_PASSWORD: rootpass
+      DB_NAME: order_db
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: admin
+      RABBITMQ_PASS: adminpass
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  api-gateway:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/api-gateway:latest
+    ports:
+      - "5000:5000"
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:5001
+      CATALOG_SERVICE_URL: http://catalog-service:5002
+      ORDER_SERVICE_URL: http://order-service:5003
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  client:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/client:latest
+    ports:
+      - "8080:8080"
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  auth_db_data:
+    driver: local
+  catalog_db_data:
+    driver: local
+  order_db_data:
+    driver: local
+
+networks:
+  default:
+    driver: overlay
