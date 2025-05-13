@@ -68,59 +68,53 @@ for i in "${!dbs[@]}"; do
     fi
 done
 
-# Generar las tablas para cada servicio
-for service in "${services[@]}"; do
-    echo -e "\n${BLUE}📦 Procesando $service...${NC}"
+# Función para inicializar base de datos de un servicio
+initialize_database() {
+    local service=$1
+    echo -e "${BLUE}🗄️ Inicializando base de datos para $service...${NC}"
     
-    # Encontrar el ID del contenedor para el servicio
-    SERVICE_CONTAINER_ID=$(docker ps --filter name="${STACK_NAME}_${service}" --format "{{.ID}}" | head -n1)
-    
-    if [ -z "$SERVICE_CONTAINER_ID" ]; then
-        echo -e "${RED}❌ No se encontró contenedor para ${service}${NC}"
-        continue
-    fi
-    
-    echo -e "${BLUE}🔍 Contenedor ${service} encontrado: ${SERVICE_CONTAINER_ID}${NC}"
-    
-    # Ejecutar comando para crear tablas dentro del contenedor
-    echo -e "${BLUE}🗄️ Creando tablas para $service...${NC}"
-    docker exec $SERVICE_CONTAINER_ID python -c "
-import time
+    # Crear servicio temporal para inicializar base de datos
+    docker service create --name init-${service}-db \
+      --network ${STACK_NAME}_default \
+      --env DB_HOST=${service//-service/}-db \
+      --env DB_USER=root \
+      --env DB_PASSWORD=rootpass \
+      --env DB_NAME=${service//-service/}_db \
+      --restart-condition=none \
+      ${DOCKER_USERNAME}/${service}:latest \
+      python -c "
 from app import create_app, db
-
-# Intentar conectarse a la base de datos con reintentos
-max_retries = 5
-retry_count = 0
-connected = False
-
-while retry_count < max_retries and not connected:
-    try:
-        app = create_app()
-        with app.app_context():
-            # Verificar conexión
-            db.engine.connect()
-            connected = True
-            print('Conexión a la base de datos establecida')
-            
-            # Crear tablas
-            db.create_all()
-            print('Tablas creadas exitosamente')
-    except Exception as e:
-        retry_count += 1
-        print(f'Intento {retry_count}/{max_retries} falló: {str(e)}')
-        if retry_count < max_retries:
-            print('Reintentando en 3 segundos...')
-            time.sleep(3)
-        else:
-            print('No se pudo conectar a la base de datos después de varios intentos')
-            raise e
-" 2>&1
+app = create_app()
+with app.app_context():
+    db.create_all()
+    print('Tablas creadas exitosamente')
+"
     
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✅ Tablas creadas exitosamente para $service${NC}"
-    else
-        echo -e "${RED}❌ Error al crear tablas para $service${NC}"
-    fi
+    # Esperar a que termine la inicialización
+    echo -e "${YELLOW}⏳ Esperando a que termine la inicialización de $service...${NC}"
+    
+    # Esperar hasta que el servicio termine (o falle)
+    while docker service ls | grep -q "init-${service}-db"; do
+        # Verificar si el servicio ha terminado
+        if ! docker service ps --no-trunc init-${service}-db | grep -q "Running"; then
+            if docker service ps --no-trunc init-${service}-db | grep -q "Complete"; then
+                echo -e "${GREEN}✅ Inicialización de $service completada${NC}"
+                break
+            elif docker service ps --no-trunc init-${service}-db | grep -q "Failed"; then
+                echo -e "${RED}❌ Inicialización de $service falló${NC}"
+                break
+            fi
+        fi
+        sleep 2
+    done
+    
+    # Eliminar el servicio temporal
+    docker service rm init-${service}-db > /dev/null 2>&1
+}
+
+# Inicializar cada servicio
+for service in "${services[@]}"; do
+    initialize_database $service
 done
 
 # Verificar que todos los servicios estén funcionando
