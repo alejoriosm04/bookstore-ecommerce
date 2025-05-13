@@ -39,6 +39,8 @@ El sistema utiliza la arquitectura de microservicios y se gestiona con Docker Sw
 - Escalabilidad horizontal con Docker Swarm.
 
 ### 3. Descripción del ambiente de desarrollo y técnico
+#### 3.1 Lenguajes y tecnologías principales
+
 | Componente           | Tecnología         | Versión               |
 |----------------------|--------------------|------------------------|
 | Frontend             | Flask (Python)     | 3.1.0                 |
@@ -49,8 +51,41 @@ El sistema utiliza la arquitectura de microservicios y se gestiona con Docker Sw
 | Orquestación         | Docker Swarm       | Docker 24.0.5         |
 | Contenedores         | Docker Engine      | 24.0.5                |
 
+#### 3.2 Cómo compilar y ejecutar el proyecto
 
+Clonar el repositorio en el equipo local.
+```bash
+git clone https://github.com/alejoriosm04/rpc-mom-comm.git
+```
 
+Configurar las variables de entorno. Cada microservicio requiere variables de entorno para la configuración de la base de datos y RabbitMQ.
+```bash
+cp .env.example .env
+```
+
+Crear las bases de datos, Para cada microservicio, ejecutar lo siguiente para crear las tablas en las bases de datos respectivas:
+```bash
+flask shell
+>>> from app.models import db
+>>> db.create_all()
+```
+
+#### 3.3 Detalles del desarrollo
+Este proyecto utiliza el patrón de microservicios para cada funcionalidad del sistema. Además, cada microservicio tiene su propia base de datos.
+
+#### 3.4 Estructura del proyecto
+```bash
+.
+├── api-gateway/                 # API Gateway (Flask)
+├── client/                       # Cliente (Frontend en Flask)
+├── microservices/
+│   ├── auth-service/             # Microservicio de Autenticación
+│   ├── catalog-service/          # Microservicio de Catálogo
+│   └── order-service/            # Microservicio de Órdenes
+├── docker-compose.yml           # Archivo para levantar todos los servicios
+└── README.md                    # Documentación del proyecto
+
+```
 
 
 
