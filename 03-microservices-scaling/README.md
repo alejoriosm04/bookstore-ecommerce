@@ -87,6 +87,7 @@ Este proyecto utiliza el patrón de microservicios para cada funcionalidad del s
 
 ```
 
+### Referencias
+Docker. (n.d.). Swarm mode overview. Docker. Recuperado el 13 de mayo de 2025, de https://docs.docker.com/engine/swarm/
 
-
-
+Flask. (n.d.). Flask documentation. Flask. Recuperado el 13 de mayo de 2025, de https://flask.palletsprojects.com/en/stable/
