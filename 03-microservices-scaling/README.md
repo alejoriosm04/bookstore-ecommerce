@@ -53,29 +53,10 @@ El sistema utiliza la arquitectura de microservicios y se gestiona con Docker Sw
 | Orquestación         | Docker Swarm       | Docker 24.0.5         |
 | Contenedores         | Docker Engine      | 24.0.5                |
 
-#### 3.2 Cómo compilar y ejecutar el proyecto
-
-Clonar el repositorio en el equipo local.
-```bash
-git clone https://github.com/alejoriosm04/rpc-mom-comm.git
-```
-
-Configurar las variables de entorno. Cada microservicio requiere variables de entorno para la configuración de la base de datos y RabbitMQ.
-```bash
-cp .env.example .env
-```
-
-Crear las bases de datos, Para cada microservicio, ejecutar lo siguiente para crear las tablas en las bases de datos respectivas:
-```bash
-flask shell
->>> from app.models import db
->>> db.create_all()
-```
-
-#### 3.3 Detalles del desarrollo
+#### 3.2 Detalles del desarrollo
 Este proyecto utiliza el patrón de microservicios para cada funcionalidad del sistema. Además, cada microservicio tiene su propia base de datos.
 
-#### 3.4 Estructura del proyecto
+#### 3.3 Estructura del proyecto
 ```bash
 .
 ├── api-gateway/                 # API Gateway (Flask)
@@ -88,6 +69,81 @@ Este proyecto utiliza el patrón de microservicios para cada funcionalidad del s
 └── README.md                    # Documentación del proyecto
 
 ```
+### 4. Despliegue del Proyecto en Docker Swarm
+Para poner en marcha el clúster Docker Swarm y desplegar los microservicios, sigue estos pasos detallados:
+
+#### 4.1 Configuración de la infraestructura
+1. Crear un Security Group en la consola de AWS con los siguientes puertos abiertos:
+
+* TCP - 2377
+* TCP - 7946
+* UDP - 7946
+* UDP - 4789
+* TCP - 5000-5003
+* TCP - 8080
+* TCP - 5672
+* TCP - 15672
+* MYSQL/AURORA - 3306
+
+2. Crear 3 instancias EC2 con características **t2.medium** y **16 GiB gp3**, asignándolas al mismo grupo de seguridad.
+
+#### 4.2 Instalación de dependencias
+En cada instancia, instala las dependencias necesarias:
+```bash
+sudo apt update
+sudo apt install docker.io -y
+sudo apt install docker-compose -y
+
+sudo systemctl enable docker
+sudo systemctl start docker
+```
+
+#### 4.3 Configurar permisos para Docker
+Haz que el usuario ubuntu tenga permisos para ejecutar Docker sin necesidad de usar sudo:
+
+```bash
+sudo usermod -a -G docker ubuntu
+```
+
+Recuerda refrescar la página de la instancia para aplicar los cambios.
+
+#### 4.4 Inicializar Docker Swarm en el nodo manager
+1. En el nodo manager, inicializa Docker Swarm con el siguiente comando:
+
+```bash
+sudo docker swarm init
+```
+2. Luego, obtén el token para unir los nodos worker al clúster:
+
+```bash
+sudo docker swarm join-token manager
+```
+
+#### 4.5 Unir nodos worker al clúster
+En cada nodo worker, ejecuta el token generado para unirte al clúster:
+
+```bash
+sudo docker swarm join --token <token>
+```
+
+#### 4.6 Desplegar la aplicación usando Docker Swarm
+1. En el nodo manager, clona el repositorio y navega al directorio del proyecto:
+
+```bash
+git clone https://github.com/alejoriosm04/bookstore-ecommerce.git
+cd bookstore-ecommerce/03-microservices-scaling/
+```
+2. Concede permisos de ejecución al archivo de despliegue:
+```bash
+chmod +x swarm-deploy.sh
+```
+3. Ejecuta el script de despliegue:
+
+```bash
+sudo -E ./swarm-deploy.sh
+```
+
+**Durante el despliegue, si ves errores de tipo "Task failure", presiona CTRL+C y vuelve a ejecutar el script varias veces hasta que los servicios se levanten correctamente.**
 
 ### Referencias
 Docker. (n.d.). Swarm mode overview. Docker. Recuperado el 13 de mayo de 2025, de https://docs.docker.com/engine/swarm/
