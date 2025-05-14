@@ -25,6 +25,8 @@ El sistema está compuesto por los siguientes componentes:
 - RabbitMQ: Utilizado para la gestión de eventos entre los microservicios (creación, actualización y eliminación de libros).
 - Base de datos (MySQL): Cada microservicio tiene su propia base de datos para almacenar los datos de usuarios, libros y órdenes.
 
+![image](https://github.com/user-attachments/assets/d73e75e8-7b3f-4826-9dd8-686a508fe973)
+
 #### 2.2 Arquitectura
 El sistema utiliza la arquitectura de microservicios y se gestiona con Docker Swarm para escalar los microservicios de forma horizontal.
 
