@@ -776,7 +776,7 @@ La aplicación BookStore permite a los usuarios autenticarse, explorar libros di
 * [Flask Microservices](https://flask.palletsprojects.com/)
 * [RabbitMQ Docs](https://www.rabbitmq.com/documentation.html)
 * [Certbot](https://certbot.eff.org/)
-- [Cursor AI](https://www.cursor.com/): Plataforma de desarrollo asistido con IA, ideal para trabajo colaborativo y debugging.
-- [ChatGPT](https://chatgpt.com/): Asistente conversacional utilizado para ideación, redacción y soporte técnico en este proyecto.
+- [Cursor AI](https://www.cursor.com/)
+- [ChatGPT](https://chatgpt.com/)
 - Diapositivas de clase - *Tópicos Especiales en Telemática ST0263*: Material académico de referencia utilizado durante el desarrollo del proyecto.
 * Repositorio base: [https://github.com/st0263eafit/st0263-251/blob/main/proyecto2/BookStore.zip](https://github.com/st0263eafit/st0263-251/blob/main/proyecto2/BookStore.zip)
