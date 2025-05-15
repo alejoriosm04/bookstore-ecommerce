@@ -61,7 +61,6 @@ El proyecto se desarrolló en tres etapas progresivas:
 * RNF01: Certificado SSL para el acceso por HTTPS
 * RNF02: Balanceo de carga y alta disponibilidad (objetivo 2 y 3)
 * RNF03: Contenerización y despliegue reproducible con Docker
-* RNF04: Comunicación asíncrona entre servicios (RabbitMQ en objetivo 3)
 
 ### 1.2 Aspectos NO desarrollados
 
