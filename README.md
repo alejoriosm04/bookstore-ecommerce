@@ -215,7 +215,6 @@ Arquitectura distribuida basada en microservicios desplegados sobre múltiples n
 * **Proxy inverso (NGINX):** En el monolito, direcciona tráfico a Flask según puerto.
 * **CQRS (Command-Query Responsibility Segregation):** Separa lectura y escritura en órdenes y catálogo.
 * **Blueprints (Flask):** Permite modularizar rutas, controladores y lógica.
-* **Fallback con MOM:** RabbitMQ asegura mensajes cuando un microservicio está caído.
 * **Launch Template + AMI personalizada:** Permite instancias EC2 preconfiguradas listas para escalar.
 * **Target Groups y Health Checks:** En el ELB, aseguran balanceo efectivo y desconexión automática de instancias defectuosas.
 
