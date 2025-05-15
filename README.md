@@ -50,22 +50,40 @@ El proyecto se desarrolló en tres etapas progresivas:
 
 #### Funcionales
 
-* RF01: Registro, login y logout de usuarios
-* RF02: Visualización de catálogo de libros
-* RF03: Compra de libros (simulada)
-* RF04: Pago y envío simulado
-* RF05: Separación de funcionalidades en microservicios (objetivo 3)
+* RF01 – Registro, login y logout de usuarios:
+El sistema debe permitir a los usuarios crear una cuenta, iniciar sesión de forma segura y cerrar sesión cuando lo deseen. Implementado con autenticación basada en Flask y microservicio independiente en el objetivo 3.
+
+* RF02 – Visualización de catálogo de libros:
+Los usuarios deben poder explorar los libros disponibles para la venta, publicados por otros usuarios, sin necesidad de iniciar sesión. El catálogo se gestiona desde una base de datos y es consultado vía API.
+
+* RF03 – Compra de libros (simulada):
+El sistema debe permitir que los usuarios agreguen libros al carrito y realicen una compra. Se simula la disponibilidad del stock y la transacción de compra sin pagos reales.
+
+* RF04 – Pago y envío simulado:
+Una vez realizado el pedido, se simula el proceso de pago y se registra una orden de entrega con información ficticia, como si el envío fuera gestionado por un proveedor logístico.
+
+* RF05 – Separación de funcionalidades en microservicios (objetivo 3):
+El sistema debe estar dividido en microservicios: uno para autenticación, otro para catálogo, y otro para gestión de órdenes y pagos. Cada uno cuenta con su lógica, base de datos y comunicación interna vía gRPC.
+
+
 
 #### No funcionales
 
-* RNF01: Certificado SSL para el acceso por HTTPS
-* RNF02: Balanceo de carga y alta disponibilidad (objetivo 2 y 3)
-* RNF03: Contenerización y despliegue reproducible con Docker
+* RNF01 – Alta disponibilidad:
+El sistema debe garantizar la continuidad del servicio incluso ante la caída de una instancia. Esto se logró mediante el uso de múltiples réplicas y balanceadores de carga como ELB y mecanismos de escalado automático.
+
+* RNF02 – Tolerancia a fallos:
+La arquitectura debe detectar y recuperarse automáticamente de fallos. Se implementó usando Auto Scaling en AWS para reponer instancias caídas y, en el objetivo 3, con Docker Swarm para reubicar servicios automáticamente en otros nodos.
+
+* RNF03 – Escalabilidad horizontal:
+El sistema debe ser capaz de aumentar su capacidad al agregar nuevas instancias. Esto se cumplió mediante grupos de Auto Scaling en el objetivo 2 y servicios replicados en Docker Swarm para el objetivo 3.
+
+* RNF07 – Balanceo de carga:
+Las peticiones deben distribuirse equitativamente entre las instancias disponibles. Esto se gestionó mediante el Elastic Load Balancer de AWS en el objetivo 2 y el balanceador interno de Docker Swarm en el objetivo 3.
 
 ### 1.2 Aspectos NO desarrollados
 
-* No se usó Kubernetes (EKS) por restricciones de la cuenta AWS Academy
-* La interfaz de usuario fue simulada o mantenida con una versión web sencilla (en vez de Next.js)
+* No se usó Kubernetes (EKS) por restricciones de la cuenta AWS Academy, en cambio se usó Docker Swarm
 
 ---
 
